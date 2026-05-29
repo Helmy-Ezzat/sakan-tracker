@@ -1,13 +1,15 @@
 "use client";
 
-import { SessionHeader } from "@/components/dashboard/SessionHeader";
-import { EnableNotificationsBanner } from "@/components/dashboard/EnableNotificationsBanner";
+import { SettleCycleButton } from "@/components/dashboard/SettleCycleButton";
+import { SettlementSummary } from "@/components/dashboard/SettlementSummary";
+
 import type { DashboardData } from "@/lib/data/session";
 import { createClient } from "@/lib/supabase/client";
+import { calculateSettlement } from "@/lib/utils";
 import type { Expense, User } from "@/types/database";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-type DashboardClientProps = DashboardData & {
+type SettlementClientProps = DashboardData & {
   currentUser: User;
   roomCode: string;
 };
@@ -25,12 +27,13 @@ function mergeExpense(list: Expense[], expense: Expense): Expense[] {
   return next;
 }
 
-export function DashboardClient({
+export function SettlementClient({
   session,
   expenses: initialExpenses,
   members,
+  currentUser,
   roomCode,
-}: DashboardClientProps) {
+}: SettlementClientProps) {
   const [expenses, setExpenses] = useState(initialExpenses);
 
   useEffect(() => {
@@ -54,7 +57,7 @@ export function DashboardClient({
     const supabase = createClient();
 
     const channel = supabase
-      .channel(`expenses:${session.id}:dashboard`)
+      .channel(`expenses:${session.id}:settlement`)
       .on(
         "postgres_changes",
         {
@@ -78,18 +81,15 @@ export function DashboardClient({
     };
   }, [session.id, roomCode, applyRealtime]);
 
-  const totalExpenses = useMemo(
-    () => expenses.reduce((sum, e) => sum + Number(e.amount), 0),
-    [expenses],
+  const settlement = useMemo(
+    () => calculateSettlement(expenses, members),
+    [expenses, members],
   );
 
   return (
     <div className="space-y-6">
-      <EnableNotificationsBanner />
-      <SessionHeader
-        totalExpenses={totalExpenses}
-        memberCount={members.length}
-      />
+      <SettlementSummary lines={settlement} />
+      <SettleCycleButton isAdmin={currentUser.role === "admin"} />
     </div>
   );
 }

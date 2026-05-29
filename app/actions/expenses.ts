@@ -16,6 +16,7 @@ import { formatCurrency } from "@/lib/utils";
 import { parseExpenseAmount } from "@/lib/validation/expense";
 import type { Expense } from "@/types/database";
 import { revalidatePath } from "next/cache";
+import { ROUTES } from "@/lib/constants";
 
 export type AddExpenseResult =
   | { success: true; expense: Expense }
@@ -78,7 +79,9 @@ export async function addExpense(input: {
       }
     }
 
-    revalidatePath("/dashboard");
+    revalidatePath(ROUTES.dashboard);
+    revalidatePath(ROUTES.expenses);
+    revalidatePath(ROUTES.settlement);
     return { success: true, expense };
   } catch (err) {
     return {
@@ -102,7 +105,9 @@ export async function deleteExpense(
 
   try {
     await deleteOwnExpense(expenseId, userId);
-    revalidatePath("/dashboard");
+    revalidatePath(ROUTES.dashboard);
+    revalidatePath(ROUTES.expenses);
+    revalidatePath(ROUTES.settlement);
     return { success: true };
   } catch (err) {
     return {

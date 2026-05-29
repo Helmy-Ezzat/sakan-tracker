@@ -32,7 +32,9 @@ export const ar = {
   nav: {
     main: "القائمة الرئيسية",
     dashboard: "الرئيسية",
-    archive: "المِياز القديمة",
+    expenses: "المشتريات",
+    settlement: "التصفية",
+    archive: "الأرشيف",
   },
 
   auth: {
@@ -74,7 +76,7 @@ export const ar = {
     settlement: "صفحة التصفية (مين ليه ومين عليه)",
     noMembers: "مفيش شباب مسجلين لسه. أول ما حد يدخل هتبان الحسبة هنا.",
     settled: "خالصان — مفيش عليه ولا ليه",
-    settlementStatus: "الوضع في الميز",
+    settlementStatus: "المستحقات",
     owedAmount: (amount: string) => `ليه ${amount}`,
     owesAmount: (amount: string) => `عليه ${amount}`,
     totalPaid: "دفع",

@@ -31,8 +31,10 @@ export async function settleSession(): Promise<SettleResult> {
 
   try {
     await settleAndStartNewSession(userId, roomCode);
-    revalidatePath("/dashboard");
-    revalidatePath("/archive");
+    revalidatePath(ROUTES.dashboard);
+    revalidatePath(ROUTES.expenses);
+    revalidatePath(ROUTES.settlement);
+    revalidatePath(ROUTES.archive);
     redirect(ROUTES.dashboard);
   } catch (err) {
     return {

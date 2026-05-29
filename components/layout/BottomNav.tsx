@@ -8,6 +8,8 @@ import { usePathname } from "next/navigation";
 
 const navItems = [
   { href: ROUTES.dashboard, label: ar.nav.dashboard, icon: "◉" },
+  { href: ROUTES.expenses, label: ar.nav.expenses, icon: "🛒" },
+  { href: ROUTES.settlement, label: ar.nav.settlement, icon: "⚖️" },
   { href: ROUTES.archive, label: ar.nav.archive, icon: "▤" },
 ] as const;
 
