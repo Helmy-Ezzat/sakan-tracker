@@ -1,6 +1,6 @@
 import type { Expense, SettlementLine, User } from "@/types/database";
 
-/** Format amount with Arabic numerals + "ريال" (no ر.س. abbreviation). */
+/** Format amount with Arabic numerals + "ريال". */
 export function formatCurrency(amount: number, locale = "ar-SA"): string {
   const formatted = new Intl.NumberFormat(locale, {
     minimumFractionDigits: 0,
