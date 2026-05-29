@@ -14,6 +14,19 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   return output;
 }
 
+function subscriptionToInput(
+  subscription: PushSubscription,
+): PushSubscriptionInput {
+  const json = subscription.toJSON();
+  if (!json.endpoint || !json.keys?.p256dh || !json.keys?.auth) {
+    throw new Error("Invalid push subscription");
+  }
+  return {
+    endpoint: json.endpoint,
+    keys: { p256dh: json.keys.p256dh, auth: json.keys.auth },
+  };
+}
+
 export function isPushSupported(): boolean {
   return (
     typeof window !== "undefined" &&
@@ -21,6 +34,56 @@ export function isPushSupported(): boolean {
     "PushManager" in window &&
     "Notification" in window
   );
+}
+
+async function getServiceWorkerRegistration(): Promise<ServiceWorkerRegistration> {
+  const registration = await navigator.serviceWorker.register("/sw.js", {
+    scope: "/",
+    updateViaCache: "none",
+  });
+  await navigator.serviceWorker.ready;
+  return registration;
+}
+
+async function subscribeWithCurrentVapid(
+  registration: ServiceWorkerRegistration,
+  vapidPublicKey: string,
+): Promise<PushSubscription> {
+  const options = {
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(vapidPublicKey) as BufferSource,
+  };
+
+  try {
+    return await registration.pushManager.subscribe(options);
+  } catch {
+    const stale = await registration.pushManager.getSubscription();
+    if (stale) {
+      await stale.unsubscribe();
+    }
+    return registration.pushManager.subscribe(options);
+  }
+}
+
+/** Re-save an existing browser subscription to Supabase (e.g. after DB reset). */
+export async function syncPushSubscription(): Promise<boolean> {
+  if (!isPushSupported() || Notification.permission !== "granted") {
+    return false;
+  }
+
+  const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  if (!vapidPublicKey) return false;
+
+  try {
+    const registration = await getServiceWorkerRegistration();
+    const subscription = await registration.pushManager.getSubscription();
+    if (!subscription) return false;
+
+    const result = await savePushSubscription(subscriptionToInput(subscription));
+    return result.success;
+  } catch {
+    return false;
+  }
 }
 
 export async function registerForPushNotifications(): Promise<
@@ -34,34 +97,15 @@ export async function registerForPushNotifications(): Promise<
   const permission = await Notification.requestPermission();
   if (permission !== "granted") return "denied";
 
-  const registration = await navigator.serviceWorker.register("/sw.js", {
-    scope: "/",
-    updateViaCache: "none",
-  });
-  await navigator.serviceWorker.ready;
+  const registration = await getServiceWorkerRegistration();
 
   let subscription = await registration.pushManager.getSubscription();
 
   if (!subscription) {
-    subscription = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(
-        vapidPublicKey,
-      ) as BufferSource,
-    });
+    subscription = await subscribeWithCurrentVapid(registration, vapidPublicKey);
   }
 
-  const json = subscription.toJSON();
-  if (!json.endpoint || !json.keys?.p256dh || !json.keys?.auth) {
-    throw new Error("Invalid push subscription");
-  }
-
-  const input: PushSubscriptionInput = {
-    endpoint: json.endpoint,
-    keys: { p256dh: json.keys.p256dh, auth: json.keys.auth },
-  };
-
-  const result = await savePushSubscription(input);
+  const result = await savePushSubscription(subscriptionToInput(subscription));
   if (!result.success) {
     throw new Error(result.error);
   }

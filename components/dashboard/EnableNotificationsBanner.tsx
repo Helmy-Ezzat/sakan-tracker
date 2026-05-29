@@ -2,7 +2,11 @@
 
 import { Button } from "@/components/ui/Button";
 import { ar } from "@/lib/i18n/ar";
-import { isPushSupported, registerForPushNotifications } from "@/lib/push/client";
+import {
+  isPushSupported,
+  registerForPushNotifications,
+  syncPushSubscription,
+} from "@/lib/push/client";
 import { useEffect, useState } from "react";
 
 const DISMISS_KEY = "sakan_push_dismissed";
@@ -21,9 +25,8 @@ export function EnableNotificationsBanner() {
       if (permission === "denied") return;
 
       if (permission === "granted") {
-        const registration = await navigator.serviceWorker.getRegistration("/");
-        const existing = await registration?.pushManager.getSubscription();
-        if (existing) return;
+        const synced = await syncPushSubscription();
+        if (synced) return;
       }
 
       setVisible(true);

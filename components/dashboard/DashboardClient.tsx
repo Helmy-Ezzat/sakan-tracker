@@ -11,6 +11,7 @@ import { FAB } from "@/components/ui/FAB";
 import { useToast } from "@/components/ui/Toast";
 import type { DashboardData } from "@/lib/data/session";
 import { ar } from "@/lib/i18n/ar";
+import { syncPushSubscription } from "@/lib/push/client";
 import { createClient } from "@/lib/supabase/client";
 import { calculateSettlement, formatCurrency } from "@/lib/utils";
 import type { Expense, User } from "@/types/database";
@@ -47,6 +48,10 @@ export function DashboardClient({
   useEffect(() => {
     setExpenses(initialExpenses);
   }, [initialExpenses]);
+
+  useEffect(() => {
+    void syncPushSubscription();
+  }, []);
 
   const applyRealtime = useCallback(
     (payload: { eventType: string; new: Expense; old: Expense }) => {

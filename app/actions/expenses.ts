@@ -56,16 +56,24 @@ export async function addExpense(input: {
       description,
     });
 
-    void sendExpensePushNotifications({
-      sessionId: session.id,
-      excludeUserId: userId,
-      expenseId: expense.id,
-      userName: user.name,
-      amountLabel: formatCurrency(amount),
-      description,
-    }).catch(() => {
-      /* push is best-effort */
-    });
+    // Must await: on Vercel/serverless, fire-and-forget promises are killed when the action returns.
+    try {
+      const pushResult = await sendExpensePushNotifications({
+        sessionId: session.id,
+        excludeUserId: userId,
+        expenseId: expense.id,
+        userName: user.name,
+        amountLabel: formatCurrency(amount),
+        description,
+      });
+      if (process.env.NODE_ENV === "development" && pushResult.skipped) {
+        console.warn("[push] skipped:", pushResult.reason);
+      }
+    } catch (pushErr) {
+      if (process.env.NODE_ENV === "development") {
+        console.error("[push] sendExpensePushNotifications failed", pushErr);
+      }
+    }
 
     revalidatePath("/dashboard");
     return { success: true, expense };

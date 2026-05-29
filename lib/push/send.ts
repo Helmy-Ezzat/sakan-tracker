@@ -7,6 +7,26 @@ import type { ExpensePushPayload } from "@/lib/push/types";
 import { configureWebPush, isPushConfigured } from "@/lib/push/vapid";
 import webpush from "web-push";
 
+function getWebPushStatusCode(err: unknown): number | undefined {
+  if (err && typeof err === "object" && "statusCode" in err) {
+    const code = (err as { statusCode: unknown }).statusCode;
+    return typeof code === "number" ? code : undefined;
+  }
+  return undefined;
+}
+
+/** Subscription expired or VAPID keys changed — remove so user can re-register. */
+function isStaleSubscriptionError(status: number | undefined): boolean {
+  return status === 401 || status === 403 || status === 404 || status === 410;
+}
+
+export type PushSendResult = {
+  sent: number;
+  failed: number;
+  skipped: boolean;
+  reason?: string;
+};
+
 export async function sendExpensePushNotifications(params: {
   sessionId: string;
   excludeUserId: string;
@@ -14,8 +34,10 @@ export async function sendExpensePushNotifications(params: {
   userName: string;
   amountLabel: string;
   description: string;
-}): Promise<void> {
-  if (!isPushConfigured()) return;
+}): Promise<PushSendResult> {
+  if (!isPushConfigured()) {
+    return { sent: 0, failed: 0, skipped: true, reason: "vapid_not_configured" };
+  }
 
   configureWebPush();
 
@@ -24,7 +46,9 @@ export async function sendExpensePushNotifications(params: {
     params.excludeUserId,
   );
 
-  if (subscriptions.length === 0) return;
+  if (subscriptions.length === 0) {
+    return { sent: 0, failed: 0, skipped: true, reason: "no_subscriptions" };
+  }
 
   const payload: ExpensePushPayload = {
     title: ar.appName,
@@ -38,8 +62,10 @@ export async function sendExpensePushNotifications(params: {
   };
 
   const body = JSON.stringify(payload);
+  let sent = 0;
+  let failed = 0;
 
-  await Promise.allSettled(
+  await Promise.all(
     subscriptions.map(async (sub) => {
       try {
         await webpush.sendNotification(
@@ -49,12 +75,19 @@ export async function sendExpensePushNotifications(params: {
           },
           body,
         );
+        sent += 1;
       } catch (err) {
-        const status = (err as { statusCode?: number }).statusCode;
-        if (status === 404 || status === 410) {
+        failed += 1;
+        const status = getWebPushStatusCode(err);
+        if (process.env.NODE_ENV === "development") {
+          console.error("[push] send failed", { status, endpoint: sub.endpoint, err });
+        }
+        if (isStaleSubscriptionError(status)) {
           await deletePushSubscription(sub.endpoint);
         }
       }
     }),
   );
+
+  return { sent, failed, skipped: false };
 }
