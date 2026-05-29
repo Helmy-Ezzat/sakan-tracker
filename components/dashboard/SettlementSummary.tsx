@@ -34,8 +34,10 @@ export function SettlementSummary({ lines }: SettlementSummaryProps) {
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted">{ar.dashboard.netBalance}</p>
-                  <NetBalance value={line.balance} />
+                  <p className="text-xs text-muted">
+                    {ar.dashboard.settlementStatus}
+                  </p>
+                  <SettlementStatus balance={line.balance} />
                 </div>
               </div>
             </Card>
@@ -46,10 +48,10 @@ export function SettlementSummary({ lines }: SettlementSummaryProps) {
   );
 }
 
-function NetBalance({ value }: { value: number }) {
+function SettlementStatus({ balance }: { balance: number }) {
   const threshold = 0.01;
 
-  if (Math.abs(value) < threshold) {
+  if (Math.abs(balance) < threshold) {
     return (
       <p className="mt-0.5 text-sm font-medium text-success">
         {ar.dashboard.settled}
@@ -57,17 +59,19 @@ function NetBalance({ value }: { value: number }) {
     );
   }
 
-  const isOwed = value > 0;
+  const amount = formatCurrency(Math.abs(balance));
+  const isOwed = balance > 0;
 
   return (
     <p
       className={cn(
-        "mt-0.5 text-sm font-semibold tabular-nums",
+        "mt-0.5 text-sm font-semibold leading-snug",
         isOwed ? "text-success" : "text-danger",
       )}
     >
-      {isOwed ? "+" : "−"}
-      {formatCurrency(Math.abs(value))}
+      {isOwed
+        ? ar.dashboard.owedAmount(amount)
+        : ar.dashboard.owesAmount(amount)}
     </p>
   );
 }
