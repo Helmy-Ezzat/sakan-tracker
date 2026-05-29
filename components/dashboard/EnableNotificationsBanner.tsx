@@ -3,54 +3,68 @@
 import { Button } from "@/components/ui/Button";
 import { ar } from "@/lib/i18n/ar";
 import {
+  completePushSetup,
   isPushSupported,
   registerForPushNotifications,
-  syncPushSubscription,
 } from "@/lib/push/client";
-import { useEffect, useState } from "react";
-
-const DISMISS_KEY = "sakan_push_dismissed";
+import {
+  getPushSetupState,
+  isIOSSafari,
+  isStandalonePwa,
+  type PushSetupState,
+} from "@/lib/push/permission";
+import { useCallback, useEffect, useState } from "react";
 
 export function EnableNotificationsBanner() {
-  const [visible, setVisible] = useState(false);
+  const [state, setState] = useState<PushSetupState | "loading">("loading");
   const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    async function check() {
-      if (!isPushSupported()) return;
-      if (localStorage.getItem(DISMISS_KEY) === "1") return;
-
-      const permission = Notification.permission;
-      if (permission === "denied") return;
-
-      if (permission === "granted") {
-        const synced = await syncPushSubscription();
-        if (synced) return;
-      }
-
-      setVisible(true);
+  const refresh = useCallback(async () => {
+    if (!isPushSupported()) {
+      setState("unsupported");
+      return;
     }
-
-    void check();
+    const next = await getPushSetupState();
+    setState(next);
   }, []);
 
-  if (!visible) return null;
+  useEffect(() => {
+    void refresh();
+
+    function onVisible() {
+      if (document.visibilityState === "visible") {
+        void refresh();
+      }
+    }
+
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [refresh]);
+
+  if (state === "loading" || state === "ready" || state === "unsupported") {
+    return null;
+  }
 
   async function handleEnable() {
     setLoading(true);
     setStatus(null);
     try {
-      const result = await registerForPushNotifications();
+      const register =
+        state === "needs_subscription"
+          ? completePushSetup
+          : registerForPushNotifications;
+
+      const result = await register();
+
       if (result === "granted") {
         setStatus(ar.notifications.enabled);
-        window.setTimeout(() => setVisible(false), 1800);
+        await refresh();
         return;
       }
       if (result === "denied") {
+        setState("denied");
         setStatus(ar.notifications.denied);
-        localStorage.setItem(DISMISS_KEY, "1");
-        window.setTimeout(() => setVisible(false), 2500);
         return;
       }
       if (result === "misconfigured") {
@@ -65,31 +79,62 @@ export function EnableNotificationsBanner() {
     }
   }
 
-  function handleDismiss() {
-    localStorage.setItem(DISMISS_KEY, "1");
-    setVisible(false);
+  if (state === "denied") {
+    const showIosInstall = isIOSSafari() && !isStandalonePwa();
+
+    return (
+      <div className="rounded-2xl border border-warning/40 bg-warning/10 p-4">
+        <p className="font-medium text-foreground">{ar.notifications.denied}</p>
+        <p className="mt-2 text-sm text-muted">{ar.notifications.deniedHintChrome}</p>
+        <p className="mt-2 text-sm text-muted">{ar.notifications.deniedHintSafari}</p>
+        {showIosInstall ? (
+          <p className="mt-2 text-xs text-muted">
+            {ar.notifications.deniedHintIosInstall}
+          </p>
+        ) : null}
+        <p className="mt-2 text-xs text-primary">
+          بعد ما تفتح الإذن من الإعدادات، ارجع للتطبيق — هيتحدث لوحده.
+        </p>
+      </div>
+    );
   }
+
+  if (state === "misconfigured") {
+    return (
+      <div className="rounded-2xl border border-danger/40 bg-danger/10 p-4">
+        <p className="text-sm text-danger">{ar.notifications.pushNotConfigured}</p>
+      </div>
+    );
+  }
+
+  const isResume = state === "needs_subscription";
+  const title = isResume
+    ? ar.notifications.needsSubscriptionTitle
+    : ar.notifications.enableTitle;
+  const body = isResume
+    ? ar.notifications.needsSubscriptionBody
+    : ar.notifications.enableBody;
+  const action = isResume
+    ? ar.notifications.completeSetupAction
+    : ar.notifications.enableAction;
 
   return (
     <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4">
-      <p className="font-medium text-foreground">{ar.notifications.enableTitle}</p>
-      <p className="mt-1 text-sm text-muted">{ar.notifications.enableBody}</p>
-      <p className="mt-2 text-xs text-muted">{ar.notifications.installHint}</p>
+      <p className="font-medium text-foreground">{title}</p>
+      <p className="mt-1 text-sm text-muted">{body}</p>
+      {!isResume ? (
+        <p className="mt-2 text-xs text-muted">{ar.notifications.installHint}</p>
+      ) : null}
       {status ? (
-        <p className="mt-2 text-sm text-success">{status}</p>
+        <p
+          className={`mt-2 text-sm ${status === ar.notifications.denied ? "text-warning" : "text-success"}`}
+        >
+          {status}
+        </p>
       ) : (
-        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+        <div className="mt-3">
           <Button type="button" fullWidth disabled={loading} onClick={handleEnable}>
-            {loading ? ar.notifications.enabling : ar.notifications.enableAction}
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            fullWidth
-            disabled={loading}
-            onClick={handleDismiss}
-          >
-            {ar.dashboard.cancel}
+            {loading ? ar.notifications.enabling : action}
           </Button>
         </div>
       )}

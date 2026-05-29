@@ -86,17 +86,9 @@ export async function syncPushSubscription(): Promise<boolean> {
   }
 }
 
-export async function registerForPushNotifications(): Promise<
-  "granted" | "denied" | "unsupported" | "misconfigured"
-> {
-  if (!isPushSupported()) return "unsupported";
-
-  const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-  if (!vapidPublicKey) return "misconfigured";
-
-  const permission = await Notification.requestPermission();
-  if (permission !== "granted") return "denied";
-
+async function ensureSubscriptionAndSave(
+  vapidPublicKey: string,
+): Promise<void> {
   const registration = await getServiceWorkerRegistration();
 
   let subscription = await registration.pushManager.getSubscription();
@@ -109,6 +101,39 @@ export async function registerForPushNotifications(): Promise<
   if (!result.success) {
     throw new Error(result.error);
   }
+}
 
+/** Permission already granted — subscribe + save without re-prompting. */
+export async function completePushSetup(): Promise<
+  "granted" | "denied" | "unsupported" | "misconfigured"
+> {
+  if (!isPushSupported()) return "unsupported";
+
+  const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  if (!vapidPublicKey) return "misconfigured";
+
+  if (Notification.permission !== "granted") return "denied";
+
+  await ensureSubscriptionAndSave(vapidPublicKey);
+  return "granted";
+}
+
+export async function registerForPushNotifications(): Promise<
+  "granted" | "denied" | "unsupported" | "misconfigured"
+> {
+  if (!isPushSupported()) return "unsupported";
+
+  const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  if (!vapidPublicKey) return "misconfigured";
+
+  let permission = Notification.permission;
+
+  if (permission === "default") {
+    permission = await Notification.requestPermission();
+  }
+
+  if (permission !== "granted") return "denied";
+
+  await ensureSubscriptionAndSave(vapidPublicKey);
   return "granted";
 }
