@@ -11,6 +11,7 @@ export type StoredPushSubscription = {
 
 export async function upsertPushSubscription(
   userId: string,
+  roomCode: string,
   subscription: PushSubscriptionInput,
 ): Promise<void> {
   const supabase = createAdminClient();
@@ -18,6 +19,7 @@ export async function upsertPushSubscription(
   const { error } = await supabase.from("push_subscriptions").upsert(
     {
       user_id: userId,
+      room_code: roomCode,
       endpoint: subscription.endpoint,
       p256dh: subscription.keys.p256dh,
       auth_key: subscription.keys.auth,
@@ -39,6 +41,7 @@ export async function deletePushSubscription(endpoint: string): Promise<void> {
 
 export async function getPushSubscriptionsForSession(
   sessionId: string,
+  roomCode: string,
   excludeUserId: string,
 ): Promise<StoredPushSubscription[]> {
   const supabase = createAdminClient();
@@ -57,6 +60,7 @@ export async function getPushSubscriptionsForSession(
   const { data, error } = await supabase
     .from("push_subscriptions")
     .select("*")
+    .eq("room_code", roomCode)
     .in("user_id", userIds);
 
   if (error) throw error;

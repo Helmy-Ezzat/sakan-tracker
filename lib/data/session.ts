@@ -8,12 +8,13 @@ export type DashboardData = {
   usersById: Record<string, User>;
 };
 
-export async function getOrCreateActiveSession(): Promise<Session> {
+export async function getOrCreateActiveSession(roomCode: string): Promise<Session> {
   const supabase = createAdminClient();
 
   const { data: existing, error: selectError } = await supabase
     .from("sessions")
     .select("*")
+    .eq("room_code", roomCode)
     .eq("status", "active")
     .maybeSingle();
 
@@ -22,7 +23,7 @@ export async function getOrCreateActiveSession(): Promise<Session> {
 
   const { data: created, error: insertError } = await supabase
     .from("sessions")
-    .insert({ status: "active" })
+    .insert({ status: "active", room_code: roomCode })
     .select()
     .single();
 
@@ -102,6 +103,7 @@ export async function getDashboardData(
 export async function insertExpense(params: {
   sessionId: string;
   userId: string;
+  roomCode: string;
   amount: number;
   description: string;
 }): Promise<Expense> {
@@ -112,6 +114,7 @@ export async function insertExpense(params: {
     .insert({
       session_id: params.sessionId,
       user_id: params.userId,
+      room_code: params.roomCode,
       amount: params.amount,
       description: params.description,
     })
@@ -163,11 +166,13 @@ export async function deleteOwnExpense(
 
 export async function settleAndStartNewSession(
   callerUserId: string,
+  roomCode: string,
 ): Promise<string> {
   const supabase = createAdminClient();
 
   const { data, error } = await supabase.rpc("settle_and_start_new_session", {
     caller_user_id: callerUserId,
+    p_room_code: roomCode,
   });
 
   if (error) throw error;

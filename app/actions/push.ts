@@ -1,6 +1,6 @@
 "use server";
 
-import { getUserIdFromCookies } from "@/lib/auth/cookies";
+import { getRoomCodeFromCookies, getUserIdFromCookies } from "@/lib/auth/cookies";
 import { upsertPushSubscription } from "@/lib/data/push";
 import { getErrorMessage } from "@/lib/errors";
 import { ar } from "@/lib/i18n/ar";
@@ -19,12 +19,13 @@ export async function savePushSubscription(
   }
 
   const userId = await getUserIdFromCookies();
-  if (!userId) {
+  const roomCode = await getRoomCodeFromCookies();
+  if (!userId || !roomCode) {
     return { success: false, error: ar.dashboard.errors.signInAgain };
   }
 
   try {
-    await upsertPushSubscription(userId, subscription);
+    await upsertPushSubscription(userId, roomCode, subscription);
     return { success: true };
   } catch (err) {
     return {

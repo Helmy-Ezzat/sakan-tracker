@@ -7,6 +7,7 @@ function normalizeUser(row: Record<string, unknown>): User {
     name: row.name as string,
     phone_number: row.phone_number as string,
     role: ((row.role as UserRole | undefined) ?? "user") as UserRole,
+    room_code: row.room_code as string,
     created_at: row.created_at as string,
     updated_at: row.updated_at as string,
   };
@@ -19,6 +20,7 @@ export function normalizePhone(phone: string): string {
 export async function upsertUserByPhone(
   name: string,
   phone: string,
+  roomCode: string,
 ): Promise<User> {
   const supabase = createAdminClient();
   const phone_number = normalizePhone(phone);
@@ -27,6 +29,7 @@ export async function upsertUserByPhone(
     .from("users")
     .select("*")
     .eq("phone_number", phone_number)
+    .eq("room_code", roomCode)
     .maybeSingle();
 
   if (findError) throw findError;
@@ -48,7 +51,7 @@ export async function upsertUserByPhone(
 
   const { data: created, error: insertError } = await supabase
     .from("users")
-    .insert({ name: name.trim(), phone_number })
+    .insert({ name: name.trim(), phone_number, room_code: roomCode })
     .select()
     .single();
 

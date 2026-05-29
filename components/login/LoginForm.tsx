@@ -41,6 +41,16 @@ export function LoginForm() {
         required
         disabled={isPending}
       />
+      <Input
+        label={ar.auth.roomCodeLabel}
+        name="roomCode"
+        autoComplete="off"
+        placeholder={ar.auth.roomCodePlaceholder}
+        required
+        disabled={isPending}
+        dir="ltr"
+        className="text-left"
+      />
       <Button type="submit" fullWidth disabled={isPending}>
         {isPending ? ar.auth.signingIn : ar.auth.continue}
       </Button>

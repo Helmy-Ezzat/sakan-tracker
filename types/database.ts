@@ -6,6 +6,7 @@ export interface User {
   name: string;
   phone_number: string;
   role: UserRole;
+  room_code: string;
   created_at: string;
   updated_at: string;
 }
@@ -13,6 +14,7 @@ export interface User {
 export interface Session {
   id: string;
   status: SessionStatus;
+  room_code: string;
   created_at: string;
   ended_at: string | null;
 }
@@ -27,6 +29,7 @@ export interface Expense {
   id: string;
   session_id: string;
   user_id: string;
+  room_code: string;
   amount: number;
   description: string;
   created_at: string;
@@ -50,6 +53,7 @@ export interface Database {
           id?: string;
           name: string;
           phone_number: string;
+          room_code: string;
           role?: UserRole;
           created_at?: string;
           updated_at?: string;
@@ -61,6 +65,7 @@ export interface Database {
         Insert: {
           id?: string;
           status?: SessionStatus;
+          room_code: string;
           created_at?: string;
           ended_at?: string | null;
         };
@@ -81,6 +86,7 @@ export interface Database {
           id?: string;
           session_id: string;
           user_id: string;
+          room_code: string;
           amount: number;
           description: string;
           created_at?: string;

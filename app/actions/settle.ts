@@ -1,6 +1,6 @@
 "use server";
 
-import { getUserIdFromCookies } from "@/lib/auth/cookies";
+import { getRoomCodeFromCookies, getUserIdFromCookies } from "@/lib/auth/cookies";
 import { settleAndStartNewSession } from "@/lib/data/session";
 import { getUserById } from "@/lib/data/users";
 import { getErrorMessage } from "@/lib/errors";
@@ -15,7 +15,8 @@ export type SettleResult =
 
 export async function settleSession(): Promise<SettleResult> {
   const userId = await getUserIdFromCookies();
-  if (!userId) {
+  const roomCode = await getRoomCodeFromCookies();
+  if (!userId || !roomCode) {
     return { success: false, error: ar.dashboard.errors.signInAgain };
   }
 
@@ -29,7 +30,7 @@ export async function settleSession(): Promise<SettleResult> {
   }
 
   try {
-    await settleAndStartNewSession(userId);
+    await settleAndStartNewSession(userId, roomCode);
     revalidatePath("/dashboard");
     revalidatePath("/archive");
     redirect(ROUTES.dashboard);

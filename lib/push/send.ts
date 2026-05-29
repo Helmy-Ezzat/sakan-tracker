@@ -29,6 +29,7 @@ export type PushSendResult = {
 
 export async function sendExpensePushNotifications(params: {
   sessionId: string;
+  roomCode: string;
   excludeUserId: string;
   expenseId: string;
   userName: string;
@@ -43,6 +44,7 @@ export async function sendExpensePushNotifications(params: {
 
   const subscriptions = await getPushSubscriptionsForSession(
     params.sessionId,
+    params.roomCode,
     params.excludeUserId,
   );
 

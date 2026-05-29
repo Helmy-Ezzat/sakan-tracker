@@ -1,6 +1,6 @@
 "use server";
 
-import { setUserIdCookie } from "@/lib/auth/cookies";
+import { setRoomCodeCookie, setUserIdCookie } from "@/lib/auth/cookies";
 import {
   ensureSessionMember,
   getOrCreateActiveSession,
@@ -21,6 +21,7 @@ export async function loginUser(
 ): Promise<LoginResult> {
   const name = String(formData.get("name") ?? "").trim();
   const phone = normalizePhone(String(formData.get("phone") ?? ""));
+  const roomCode = String(formData.get("roomCode") ?? "").trim();
 
   if (!name) {
     return { success: false, error: ar.auth.errors.nameRequired };
@@ -28,12 +29,16 @@ export async function loginUser(
   if (phone.length < 8) {
     return { success: false, error: ar.auth.errors.phoneInvalid };
   }
+  if (!roomCode) {
+    return { success: false, error: ar.auth.errors.roomCodeRequired };
+  }
 
   try {
-    const user = await upsertUserByPhone(name, phone);
-    const session = await getOrCreateActiveSession();
+    const user = await upsertUserByPhone(name, phone, roomCode);
+    const session = await getOrCreateActiveSession(roomCode);
     await ensureSessionMember(session.id, user.id);
     await setUserIdCookie(user.id);
+    await setRoomCodeCookie(roomCode);
   } catch (err) {
     return {
       success: false,

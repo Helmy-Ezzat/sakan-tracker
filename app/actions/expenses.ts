@@ -1,6 +1,6 @@
 "use server";
 
-import { getUserIdFromCookies } from "@/lib/auth/cookies";
+import { getRoomCodeFromCookies, getUserIdFromCookies } from "@/lib/auth/cookies";
 import {
   deleteOwnExpense,
   ensureSessionMember,
@@ -26,7 +26,8 @@ export async function addExpense(input: {
   description: string;
 }): Promise<AddExpenseResult> {
   const userId = await getUserIdFromCookies();
-  if (!userId) {
+  const roomCode = await getRoomCodeFromCookies();
+  if (!userId || !roomCode) {
     return { success: false, error: ar.dashboard.errors.signInAgain };
   }
 
@@ -46,12 +47,13 @@ export async function addExpense(input: {
   }
 
   try {
-    const session = await getOrCreateActiveSession();
+    const session = await getOrCreateActiveSession(roomCode);
     await ensureSessionMember(session.id, userId);
 
     const expense = await insertExpense({
       sessionId: session.id,
       userId,
+      roomCode,
       amount,
       description,
     });
@@ -60,6 +62,7 @@ export async function addExpense(input: {
     try {
       const pushResult = await sendExpensePushNotifications({
         sessionId: session.id,
+        roomCode,
         excludeUserId: userId,
         expenseId: expense.id,
         userName: user.name,
@@ -111,14 +114,15 @@ export async function deleteExpense(
 
 export async function loadDashboardForUser() {
   const userId = await getUserIdFromCookies();
-  if (!userId) return null;
+  const roomCode = await getRoomCodeFromCookies();
+  if (!userId || !roomCode) return null;
 
   const user = await getUserById(userId);
   if (!user) return null;
 
-  const session = await getOrCreateActiveSession();
+  const session = await getOrCreateActiveSession(roomCode);
   await ensureSessionMember(session.id, userId);
 
   const data = await getDashboardData(session.id);
-  return { ...data, currentUser: user };
+  return { ...data, currentUser: user, roomCode };
 }

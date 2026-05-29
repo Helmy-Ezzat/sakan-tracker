@@ -19,6 +19,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 type DashboardClientProps = DashboardData & {
   currentUser: User;
+  roomCode: string;
 };
 
 function mergeExpense(list: Expense[], expense: Expense): Expense[] {
@@ -40,6 +41,7 @@ export function DashboardClient({
   members,
   usersById,
   currentUser,
+  roomCode,
 }: DashboardClientProps) {
   const { notifyExpense } = useToast();
   const [expenses, setExpenses] = useState(initialExpenses);
@@ -88,7 +90,7 @@ export function DashboardClient({
           event: "*",
           schema: "public",
           table: "expenses",
-          filter: `session_id=eq.${session.id}`,
+          filter: `room_code=eq.${roomCode}`,
         },
         (payload) => {
           applyRealtime({
