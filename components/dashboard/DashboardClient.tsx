@@ -6,6 +6,7 @@ import { ExpenseList } from "@/components/dashboard/ExpenseList";
 import { SessionHeader } from "@/components/dashboard/SessionHeader";
 import { SettleCycleButton } from "@/components/dashboard/SettleCycleButton";
 import { SettlementSummary } from "@/components/dashboard/SettlementSummary";
+import { EnableNotificationsBanner } from "@/components/dashboard/EnableNotificationsBanner";
 import { FAB } from "@/components/ui/FAB";
 import { useToast } from "@/components/ui/Toast";
 import type { DashboardData } from "@/lib/data/session";
@@ -39,7 +40,7 @@ export function DashboardClient({
   usersById,
   currentUser,
 }: DashboardClientProps) {
-  const { toast } = useToast();
+  const { notifyExpense } = useToast();
   const [expenses, setExpenses] = useState(initialExpenses);
   const [addExpenseOpen, setAddExpenseOpen] = useState(false);
 
@@ -55,13 +56,12 @@ export function DashboardClient({
         if (expense.user_id !== currentUser.id) {
           const name =
             usersById[expense.user_id]?.name ?? ar.dashboard.unknownUser;
-          toast(
-            ar.dashboard.expenseAddedToast(
-              name,
-              formatCurrency(Number(expense.amount)),
-              expense.description,
-            ),
-          );
+          notifyExpense({
+            id: expense.id,
+            userName: name,
+            amount: formatCurrency(Number(expense.amount)),
+            description: expense.description,
+          });
         }
       } else if (payload.eventType === "UPDATE") {
         setExpenses((prev) => mergeExpense(prev, payload.new));
@@ -69,7 +69,7 @@ export function DashboardClient({
         setExpenses((prev) => prev.filter((e) => e.id !== payload.old.id));
       }
     },
-    [currentUser.id, toast, usersById],
+    [currentUser.id, notifyExpense, usersById],
   );
 
   useEffect(() => {
@@ -131,6 +131,7 @@ export function DashboardClient({
 
   return (
     <div className="space-y-6">
+      <EnableNotificationsBanner />
       <SessionHeader
         totalExpenses={totalExpenses}
         memberCount={members.length}

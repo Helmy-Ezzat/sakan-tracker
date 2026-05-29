@@ -1,0 +1,20 @@
+{
+  "name": "متتبع السكن",
+  "short_name": "السكن",
+  "description": "تتبع مصاريف السكن المشتركة والتسويات",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#0c0f14",
+  "theme_color": "#0c0f14",
+  "lang": "ar",
+  "dir": "rtl",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -26,6 +26,8 @@ supabase db push
 - RLS policies are permissive placeholders until phone-based auth is implemented.
 - App writes use `SUPABASE_SERVICE_ROLE_KEY` on the server. Run migrations `002` and `003` for Realtime and roles/RLS.
 - Set a user to admin: `update public.users set role = 'admin' where phone_number = '05…';`
+- Run `005_push_subscriptions.sql` for background push notifications.
+- Generate VAPID keys: `npx web-push generate-vapid-keys` → add to `.env.local`.
 
 ## Env (`.env.local`)
 

@@ -23,6 +23,11 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: ar.appName,
   },
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/icon.svg", type: "image/svg+xml" }],
+  },
 };
 
 export const viewport: Viewport = {

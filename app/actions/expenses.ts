@@ -11,6 +11,8 @@ import {
 import { getUserById } from "@/lib/data/users";
 import { getErrorMessage } from "@/lib/errors";
 import { ar } from "@/lib/i18n/ar";
+import { sendExpensePushNotifications } from "@/lib/push/send";
+import { formatCurrency } from "@/lib/utils";
 import { parseExpenseAmount } from "@/lib/validation/expense";
 import type { Expense } from "@/types/database";
 import { revalidatePath } from "next/cache";
@@ -52,6 +54,17 @@ export async function addExpense(input: {
       userId,
       amount,
       description,
+    });
+
+    void sendExpensePushNotifications({
+      sessionId: session.id,
+      excludeUserId: userId,
+      expenseId: expense.id,
+      userName: user.name,
+      amountLabel: formatCurrency(amount),
+      description,
+    }).catch(() => {
+      /* push is best-effort */
     });
 
     revalidatePath("/dashboard");
