@@ -87,7 +87,7 @@ export const ar = {
       "كده هتقفل الميز الحالي وتتنقل للأرشيف، ونبدأ ميز جديد على نضافة. اتأكد إن الشباب كلها موافقة وخالصة.",
     settleConfirmAction: "صفّي الميز وابدأ على نضافة",
     expenseAddedToast: (name: string, amount: string, description: string) =>
-      `${name} صرف ${amount} ريال (${description})`,
+      `${name} صرف ${amount} (${description})`,
     errors: {
       saveFailed: "معرفناش نحفظ اللي صرفته.",
       signInAgain: "اطلع وادخل تاني عشان السيستم يقراك.",
