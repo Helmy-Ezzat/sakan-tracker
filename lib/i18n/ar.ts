@@ -54,7 +54,7 @@ export const ar = {
   dashboard: {
     currentCycle: "الميز الشغال حاليا",
     totalSpent: "كل اللي اتصرف",
-    perPerson: "نصيب النفر",
+    perPerson: "كل واحد عليه",
     addExpense: "سجّل مصروف جديد",
     closeAddExpense: "إلغاء",
     addExpenseTitle: "صرفت كام؟",
