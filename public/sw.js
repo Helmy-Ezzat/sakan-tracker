@@ -2,7 +2,7 @@
 
 self.addEventListener("push", (event) => {
   let data = {
-    title: "متتبع السكن",
+    title: "مصاريف السكن",
     body: "مصروف جديد",
     tag: "expense",
     url: "/dashboard",

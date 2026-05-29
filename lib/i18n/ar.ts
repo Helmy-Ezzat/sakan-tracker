@@ -1,131 +1,130 @@
-/** Arabic UI copy — single source for user-facing strings. */
-
+/** Arabic (Egyptian Colloquial) UI copy — single source for user-facing strings. */
 export const ar = {
-  appName: "مصاريف السكن",
-  appDescription: "تتبع مصاريف السكن المشتركة والتسويات بسهولة.",
+  appName: "ميز السكن",
+  appDescription: "احسب مصاريف ميز السكن.",
 
   notifications: {
     now: "الآن",
-    enableTitle: "فعّل إشعارات الخلفية",
+    enableTitle: "شغّل إشعارات الموبايل",
     enableBody:
-      "تصلك رسالة حتى لو الشاشة مقفولة أو وأنت في تطبيق تاني — زي واتساب.",
+      "عشان تلمح أي حاجة بتتدفع في الميز أول بأول، حتى لو الموبايل مقفول أو فاتح الواتساب.",
     installHint:
-      "على iPhone: ثبّت التطبيق على الشاشة الرئيسية ثم فعّل الإشعارات.",
+      "لو معاك آيفون: ضيف التطبيق للشاشة الرئيسية الأول (Add to Home Screen) وبعدين شغل الإشعارات.",
     enableAction: "تفعيل الإشعارات",
-    enabling: "جاري التفعيل…",
-    enabled: "تم التفعيل — جرّب من جهاز ثاني",
-    denied: "تم الرفض. فعّلها من إعدادات المتصفح / التطبيق.",
-    pushNotConfigured: "مفاتيح VAPID غير مضبوطة على السيرفر.",
-    pushSaveFailed: "تعذّر حفظ الاشتراك. حاول مرة أخرى.",
-    pushUnsupported: "المتصفح لا يدعم إشعارات الخلفية.",
+    enabling: "بنشغلها أهو…",
+    enabled: "اشتغلت تمام! جرّب من موبايل تاني كدة",
+    denied: "أنت رفضت الإذن. شغلها يدوياً من إعدادات المتصفح.",
+    pushNotConfigured: "مفاتيح الـ VAPID مش مظبوطة على السيرفر.",
+    pushSaveFailed: "مش عارفين نحفظ الاشتراك، جرب تاني.",
+    pushUnsupported: "موبايلك أو متصفحك مش بيدعم إشعارات الخلفية.",
   },
 
   nav: {
-    main: "التنقل الرئيسي",
+    main: "القائمة الرئيسية",
     dashboard: "الرئيسية",
-    archive: "الأرشيف",
+    archive: "المِياز القديمة",
   },
 
   auth: {
-    signInTitle: "الدخول إلى الجلسة",
-    signInSubtitle: "الاسم ورقم الجوال فقط — بدون كلمة مرور.",
-    nameLabel: "اسمك",
-    namePlaceholder: "أحمد",
-    phoneLabel: "رقم الجوال",
+    signInTitle: "دخول ميز السكن",
+    signInSubtitle: "اكتب اسمك ورقم موبايلك بس — من غير باسوورد وجع دماغ.",
+    nameLabel: "اسمك إيه؟",
+    namePlaceholder: "مثلاً: أحمد",
+    phoneLabel: "رقم الموبايل",
     phonePlaceholder: "05xxxxxxxx",
-    continue: "متابعة",
-    signingIn: "جاري الدخول…",
+    continue: "ادخل الميز",
+    signingIn: "بندخلك الميز أهو…",
     errors: {
-      nameRequired: "يرجى إدخال اسمك.",
-      phoneInvalid: "يرجى إدخال رقم جوال صحيح.",
-      signInFailed: "تعذّر تسجيل الدخول. حاول مرة أخرى.",
+      nameRequired: "اكتب اسمك الأول يا غالي.",
+      phoneInvalid: "اكتب رقم موبايل صح عشان الميز يظبط.",
+      signInFailed: "حصل مشكلة ومادخلتش، جرب تاني.",
     },
   },
 
   dashboard: {
-    currentCycle: "الجمعية الحالية",
-    totalSpent: "إجمالي المصروف",
-    perPerson: "لكل شخص",
-    addExpense: "إضافة مصروف",
-    closeAddExpense: "إغلاق إضافة مصروف",
-    addExpenseTitle: "إضافة مصروف",
-    addExpenseSubtitle: "سجّل ما تم صرفه في هذه الدورة.",
-    amount: "المبلغ",
+    currentCycle: "الميز الشغال حاليا",
+    totalSpent: "كل اللي اتصرف",
+    perPerson: "نصيب النفر",
+    addExpense: "سجّل مصروف جديد",
+    closeAddExpense: "إلغاء",
+    addExpenseTitle: "صرفت كام؟",
+    addExpenseSubtitle: "اكتب اللي دفعته دلوقتي عشان يتزود في الميز.",
+    amount: "المبلغ بالريال",
     amountPlaceholder: "0.00",
-    description: "الوصف",
-    descriptionPlaceholder: "رز ولحمة",
-    saveExpense: "حفظ المصروف",
-    saving: "جاري الحفظ…",
+    description: "اشتريت إيه؟ (الوصف)",
+    descriptionPlaceholder: "مثلاً: غداء رز ولحمة، شحن غاز..",
+    saveExpense: "سجّل في الميز",
+    saving: "بنحفظ أهو…",
     cancel: "إلغاء",
-    recentExpenses: "آخر المصروفات",
-    noExpenses: "لا توجد مصروفات بعد. اضغط + لإضافة أول مصروف.",
-    settlement: "التسوية",
-    noMembers: "لا يوجد أعضاء بعد. تظهر التسوية عند انضمام الأشخاص.",
-    settled: "مُسوّى",
-    owed: "يُستحق له",
-    owes: "عليه",
-    totalPaid: "إجمالي الدفع",
+    recentExpenses: "آخر حاجات اتصرفت",
+    noExpenses: "محدش صرف حاجة لسه في الميز ده. دوس (+) وسجل أول مصروف.",
+    settlement: "صفحة التصفية (مين ليه ومين عليه)",
+    noMembers: "مفيش شباب مسجلين لسه. أول ما حد يدخل هتبان الحسبة هنا.",
+    settled: "خالصان 👍",
+    owed: "ليه فلوس 🟢",
+    owes: "عليه فلوس 🔴",
+    totalPaid: "دفع كام كله",
     netBalance: "الصافي",
-    unknownUser: "غير معروف",
-    deleteExpense: "حذف المصروف",
-    deleteConfirmTitle: "حذف المصروف؟",
+    unknownUser: "شخص مجهول",
+    deleteExpense: "امسح المصروف ده",
+    deleteConfirmTitle: "عايز تمسح المصروف ده؟",
     deleteConfirmBody:
-      "سيتم حذف هذا المصروف نهائيًا من الدورة الحالية. لا يمكن التراجع عن هذا الإجراء.",
-    deleteConfirmAction: "حذف",
-    settleCycle: "تسوية وبدء جمعية جديدة",
-    settleConfirmTitle: "تسوية الدورة؟",
+      "المصروف ده هيتمسح تماماً من الميز الشغال ومفيش تراجع. متأكد؟",
+    deleteConfirmAction: "إمسح المصروف",
+    settleCycle: "قفل الميز الشغال وابدأ واحد جديد",
+    settleConfirmTitle: "عايز تقفل الميز وتصفيه؟",
     settleConfirmBody:
-      "سيتم أرشفة جميع مصروفات الدورة الحالية وبدء جمعية جديدة. تأكد أن الجميع موافق.",
-    settleConfirmAction: "تسوية وبدء جديدة",
+      "كده هتقفل الميز الحالي وتتنقل للأرشيف، ونبدأ ميز جديد على نضافة. اتأكد إن الشباب كلها موافقة وخالصة.",
+    settleConfirmAction: "صفّي الميز وابدأ على نضافة",
     expenseAddedToast: (name: string, amount: string, description: string) =>
-      `أضاف ${name} ${amount} لـ «${description}»`,
+      `${name} صرف ${amount} ريال (${description})`,
     errors: {
-      saveFailed: "تعذّر حفظ المصروف.",
-      signInAgain: "يرجى تسجيل الدخول مرة أخرى.",
-      amountInvalid: "أدخل مبلغًا صحيحًا أكبر من صفر.",
-      descriptionRequired: "يرجى إدخال وصف.",
-      saveExpenseFailed: "تعذّر حفظ المصروف.",
-      noActiveSession: "لا توجد جلسة نشطة.",
-      deleteFailed: "تعذّر حذف المصروف.",
-      deleteForbidden: "لا يمكنك حذف مصروف شخص آخر.",
-      deleteNotFound: "المصروف غير موجود.",
-      adminRequired: "هذا الإجراء متاح للمسؤول فقط.",
-      settleFailed: "تعذّر إتمام التسوية.",
+      saveFailed: "معرفناش نحفظ اللي صرفته.",
+      signInAgain: "اطلع وادخل تاني عشان السيستم يقراك.",
+      amountInvalid: "اكتب مبلغ حقيقي أكبر من الصفر يا هندسة.",
+      descriptionRequired: "اكتب اشتريت إيه عشان الباقي يفهم.",
+      saveExpenseFailed: "حصل غلطة أثناء الحفظ.",
+      noActiveSession: "مفيش ميز شغال حالياً.",
+      deleteFailed: "المسح فشل.",
+      deleteForbidden: "عيب.. متقدرش تمسح حاجة سجلها زميلك بنفسه!",
+      deleteNotFound: "المصروف ده ملوش أثر في قاعدة البيانات.",
+      adminRequired: "الميزة دي مقفولة للمسؤول عن الميز بس.",
+      settleFailed: "التصفية باظت، راجع الداتا تاني.",
     },
   },
 
   archive: {
-    title: "الأرشيف",
-    subtitle: "دورات التسوية السابقة — محفوظة ولا تُحذف.",
-    empty: "لا توجد دورات مؤرشفة بعد. عند التسوية ستظهر هنا.",
-    archivedCycle: "دورة مؤرشفة",
-    readOnly: "للقراءة فقط",
-    people: "أشخاص",
-    backToArchive: "العودة إلى الأرشيف",
-    archivedSession: "جلسة مؤرشفة",
-    detailPlaceholder: "سيتم تحميل المصروفات والتسوية النهائية من قاعدة البيانات.",
+    title: "المِياز المقفولة",
+    subtitle: "دي المِياز القديمة اللي اتصفت وخلاص.. محفوظة هنا للرجوع ليها.",
+    empty: "لسه مفيش أي ميز اتقفل واتصفى لغاية دلوقتي.",
+    archivedCycle: "ميز مقفول",
+    readOnly: "للقراءة فقط (متقفل)",
+    people: "شباب",
+    backToArchive: "ارجع للمِياز القديمة",
+    archivedSession: "ميز قديم مقفول",
+    detailPlaceholder: "جاري سحب مصاريف الميز والتصفية النهائية من الأرشيف...",
   },
 
   errors: {
     dbNotSetup:
-      "قاعدة البيانات غير مهيأة. في Supabase → محرر SQL، نفّذ supabase/migrations/001_initial_schema.sql ثم 002_realtime_anon_read.sql.",
+      "السباكة بتاعة قاعدة البيانات مش راكبة. شغل ملفات الـ migrations في الـ SQL Editor بتاع Supabase الأول.",
     tableMissing:
-      "جدول مطلوب غير موجود. نفّذ ملفات supabase/migrations/ من محرر SQL في Supabase.",
+      "فيه جدول ناقص في قاعدة البيانات، راجع مهندس السيستم عشان يشغل الـ migrations.",
   },
 } as const;
 
-/** Arabic pluralization for session member count. */
+/** Arabic pluralization for session member count (Egyptian Style). */
 export function formatMemberCount(count: number): string {
-  if (count === 0) return "لا أحد في هذه الجلسة";
-  if (count === 1) return "شخص واحد في هذه الجلسة";
-  if (count === 2) return "شخصان في هذه الجلسة";
-  if (count >= 3 && count <= 10) return `${count} أشخاص في هذه الجلسة`;
-  return `${count} شخصًا في هذه الجلسة`;
+  if (count === 0) return "محدش مسجل في الميز ده";
+  if (count === 1) return "نفر واحد في الميز";
+  if (count === 2) return "نفرين في الميز";
+  if (count >= 3 && count <= 10) return `${count} شباب في الميز`;
+  return `${count} شاب في الميز`;
 }
 
-/** Archive list member suffix, e.g. "3 أشخاص · للقراءة فقط" */
+/** Archive list member suffix, e.g. "3 شباب · مقفولة" */
 export function formatArchiveMemberLine(count: number): string {
   const people =
-    count === 1 ? "شخص واحد" : count === 2 ? "شخصان" : `${count} أشخاص`;
+    count === 1 ? "نفر واحد" : count === 2 ? "نفرين" : `${count} شباب`;
   return `${people} · ${ar.archive.readOnly}`;
 }
