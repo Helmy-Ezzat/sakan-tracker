@@ -7,6 +7,7 @@ import {
   getDashboardData,
   getOrCreateActiveSession,
   insertExpense,
+  updateOwnExpense,
 } from "@/lib/data/session";
 import { getUserById } from "@/lib/data/users";
 import { getErrorMessage } from "@/lib/errors";
@@ -113,6 +114,49 @@ export async function deleteExpense(
     return {
       success: false,
       error: getErrorMessage(err, ar.dashboard.errors.deleteFailed),
+    };
+  }
+}
+
+export type UpdateExpenseResult =
+  | { success: true; expense: Expense }
+  | { success: false; error: string };
+
+export async function updateExpense(input: {
+  expenseId: string;
+  amount: string;
+  description: string;
+}): Promise<UpdateExpenseResult> {
+  const userId = await getUserIdFromCookies();
+  if (!userId) {
+    return { success: false, error: ar.dashboard.errors.signInAgain };
+  }
+
+  const amount = parseExpenseAmount(input.amount);
+  if (amount == null) {
+    return { success: false, error: ar.dashboard.errors.amountInvalid };
+  }
+
+  const description = input.description.trim();
+  if (!description) {
+    return { success: false, error: ar.dashboard.errors.descriptionRequired };
+  }
+
+  try {
+    const expense = await updateOwnExpense(
+      input.expenseId,
+      userId,
+      amount,
+      description,
+    );
+    revalidatePath(ROUTES.dashboard);
+    revalidatePath(ROUTES.expenses);
+    revalidatePath(ROUTES.settlement);
+    return { success: true, expense };
+  } catch (err) {
+    return {
+      success: false,
+      error: getErrorMessage(err, ar.dashboard.errors.updateExpenseFailed),
     };
   }
 }

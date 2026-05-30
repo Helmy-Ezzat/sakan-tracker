@@ -1,6 +1,6 @@
 "use client";
 
-import { addExpense, deleteExpense } from "@/app/actions/expenses";
+import { addExpense, deleteExpense, updateExpense } from "@/app/actions/expenses";
 import { AddExpenseBottomSheet } from "@/components/dashboard/AddExpenseBottomSheet";
 import { ExpenseList } from "@/components/dashboard/ExpenseList";
 
@@ -123,6 +123,18 @@ export function ExpensesClient({
     setExpenses((prev) => prev.filter((e) => e.id !== expenseId));
   }
 
+  async function handleUpdateExpense(
+    expenseId: string,
+    amount: string,
+    description: string,
+  ) {
+    const result = await updateExpense({ expenseId, amount, description });
+    if (!result.success) {
+      throw new Error(result.error);
+    }
+    setExpenses((prev) => mergeExpense(prev, result.expense));
+  }
+
   return (
     <div className="space-y-6">
       <ExpenseList
@@ -130,6 +142,7 @@ export function ExpensesClient({
         usersById={usersById}
         currentUserId={currentUser.id}
         onDelete={handleDeleteExpense}
+        onUpdate={handleUpdateExpense}
       />
 
       <FAB

@@ -164,6 +164,50 @@ export async function deleteOwnExpense(
   if (deleteError) throw deleteError;
 }
 
+export async function updateOwnExpense(
+  expenseId: string,
+  callerUserId: string,
+  amount: number,
+  description: string,
+): Promise<Expense> {
+  const supabase = createAdminClient();
+
+  const { data: expense, error: fetchError } = await supabase
+    .from("expenses")
+    .select("id, user_id, session_id")
+    .eq("id", expenseId)
+    .maybeSingle();
+
+  if (fetchError) throw fetchError;
+  if (!expense) {
+    throw new Error("expense_not_found");
+  }
+  if (expense.user_id !== callerUserId) {
+    throw new Error("forbidden");
+  }
+
+  const { data: session, error: sessionError } = await supabase
+    .from("sessions")
+    .select("status")
+    .eq("id", expense.session_id)
+    .maybeSingle();
+
+  if (sessionError) throw sessionError;
+  if (!session || session.status !== "active") {
+    throw new Error("session_not_active");
+  }
+
+  const { data: updated, error: updateError } = await supabase
+    .from("expenses")
+    .update({ amount, description })
+    .eq("id", expenseId)
+    .select()
+    .single();
+
+  if (updateError) throw updateError;
+  return updated;
+}
+
 export async function settleAndStartNewSession(
   callerUserId: string,
   roomCode: string,
