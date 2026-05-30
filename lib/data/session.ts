@@ -178,3 +178,128 @@ export async function settleAndStartNewSession(
   if (error) throw error;
   return data as string;
 }
+
+export async function getArchivedSessions(roomCode: string): Promise<Session[]> {
+  const supabase = createAdminClient();
+
+  const { data, error } = await supabase
+    .from("sessions")
+    .select("*")
+    .eq("room_code", roomCode)
+    .eq("status", "archived")
+    .order("ended_at", { ascending: false });
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function getArchivedSessionsWithSummary(
+  roomCode: string,
+): Promise<
+  Array<Session & { totalExpenses: number; memberCount: number }>
+> {
+  const sessions = await getArchivedSessions(roomCode);
+  const supabase = createAdminClient();
+
+  const summaries = await Promise.all(
+    sessions.map(async (session) => {
+      const [expensesResult, membersResult] = await Promise.all([
+        supabase
+          .from("expenses")
+          .select("amount")
+          .eq("session_id", session.id)
+          .eq("room_code", roomCode),
+        supabase
+          .from("session_members")
+          .select("user_id", { count: "exact", head: true })
+          .eq("session_id", session.id),
+      ]);
+
+      const totalExpenses =
+        expensesResult.data?.reduce(
+          (sum, e) => sum + Number(e.amount),
+          0,
+        ) ?? 0;
+      const memberCount = membersResult.count ?? 0;
+
+      return {
+        ...session,
+        totalExpenses,
+        memberCount,
+      };
+    }),
+  );
+
+  return summaries;
+}
+
+export async function getArchivedSessionData(
+  sessionId: string,
+  roomCode: string,
+): Promise<{
+  session: Session;
+  expenses: Expense[];
+  members: User[];
+}> {
+  const supabase = createAdminClient();
+
+  const { data: session, error: sessionError } = await supabase
+    .from("sessions")
+    .select("*")
+    .eq("id", sessionId)
+    .eq("room_code", roomCode)
+    .eq("status", "archived")
+    .maybeSingle();
+
+  if (sessionError) throw sessionError;
+  if (!session) {
+    throw new Error("Archived session not found.");
+  }
+
+  const [expensesResult, membersResult] = await Promise.all([
+    supabase
+      .from("expenses")
+      .select("*")
+      .eq("session_id", sessionId)
+      .eq("room_code", roomCode)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("session_members")
+      .select("user_id, users(*)")
+      .eq("session_id", sessionId),
+  ]);
+
+  if (expensesResult.error) throw expensesResult.error;
+  if (membersResult.error) throw membersResult.error;
+
+  const members: User[] = (membersResult.data ?? [])
+    .map((row) => {
+      const user = row.users as unknown;
+      if (!user || Array.isArray(user)) return null;
+      return {
+        ...(user as User),
+        role: ((user as User).role ?? "user") as User["role"],
+      };
+    })
+    .filter((u): u is User => u != null);
+
+  return {
+    session,
+    expenses: expensesResult.data ?? [],
+    members,
+  };
+}
+
+export async function getArchivedSessionMemberCount(
+  sessionId: string,
+): Promise<number> {
+  const supabase = createAdminClient();
+
+  const { count, error } = await supabase
+    .from("session_members")
+    .select("*", { count: "exact", head: true })
+    .eq("session_id", sessionId);
+
+  if (error) throw error;
+  return count ?? 0;
+}

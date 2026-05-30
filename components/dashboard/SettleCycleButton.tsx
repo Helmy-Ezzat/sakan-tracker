@@ -8,9 +8,10 @@ import { useState } from "react";
 
 interface SettleCycleButtonProps {
   isAdmin: boolean;
+  hasExpenses: boolean;
 }
 
-export function SettleCycleButton({ isAdmin }: SettleCycleButtonProps) {
+export function SettleCycleButton({ isAdmin, hasExpenses }: SettleCycleButtonProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,10 +26,23 @@ export function SettleCycleButton({ isAdmin }: SettleCycleButtonProps) {
       if (!result.success) {
         setError(result.error);
         setIsLoading(false);
+        setOpen(false);
       }
+      // If success, redirect happens automatically in the action
     } catch {
+      setError("حصل خطأ غير متوقع");
       setIsLoading(false);
+      setOpen(false);
     }
+  }
+
+  function handleOpenDialog() {
+    if (!hasExpenses) {
+      setError("مفيش مصاريف في الميز عشان تقفله. سجل مصاريف الأول.");
+      return;
+    }
+    setError(null);
+    setOpen(true);
   }
 
   return (
@@ -46,7 +60,7 @@ export function SettleCycleButton({ isAdmin }: SettleCycleButtonProps) {
         type="button"
         variant="secondary"
         fullWidth
-        onClick={() => setOpen(true)}
+        onClick={handleOpenDialog}
       >
         {ar.dashboard.settleCycle}
       </Button>
@@ -59,7 +73,10 @@ export function SettleCycleButton({ isAdmin }: SettleCycleButtonProps) {
         isLoading={isLoading}
         onConfirm={handleConfirm}
         onCancel={() => {
-          if (!isLoading) setOpen(false);
+          if (!isLoading) {
+            setOpen(false);
+            setError(null);
+          }
         }}
       />
     </>

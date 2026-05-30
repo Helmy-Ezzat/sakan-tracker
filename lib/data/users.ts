@@ -49,9 +49,25 @@ export async function upsertUserByPhone(
     return normalizeUser(existing);
   }
 
+  // Check if this is the first user in this room_code
+  const { count, error: countError } = await supabase
+    .from("users")
+    .select("*", { count: "exact", head: true })
+    .eq("room_code", roomCode);
+
+  if (countError) throw countError;
+
+  const isFirstUser = (count ?? 0) === 0;
+  const role: UserRole = isFirstUser ? "admin" : "user";
+
   const { data: created, error: insertError } = await supabase
     .from("users")
-    .insert({ name: name.trim(), phone_number, room_code: roomCode })
+    .insert({
+      name: name.trim(),
+      phone_number,
+      room_code: roomCode,
+      role,
+    } as any)
     .select()
     .single();
 

@@ -31,15 +31,19 @@ export async function settleSession(): Promise<SettleResult> {
 
   try {
     await settleAndStartNewSession(userId, roomCode);
-    revalidatePath(ROUTES.dashboard);
-    revalidatePath(ROUTES.expenses);
-    revalidatePath(ROUTES.settlement);
-    revalidatePath(ROUTES.archive);
-    redirect(ROUTES.dashboard);
   } catch (err) {
     return {
       success: false,
       error: getErrorMessage(err, ar.dashboard.errors.settleFailed),
     };
   }
+
+  // Revalidate after successful settlement
+  revalidatePath(ROUTES.dashboard);
+  revalidatePath(ROUTES.expenses);
+  revalidatePath(ROUTES.settlement);
+  revalidatePath(ROUTES.archive);
+  
+  // Redirect throws, so it should be outside try/catch
+  redirect(ROUTES.dashboard);
 }

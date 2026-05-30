@@ -89,7 +89,10 @@ export function SettlementClient({
   return (
     <div className="space-y-6">
       <SettlementSummary lines={settlement} />
-      <SettleCycleButton isAdmin={currentUser.role === "admin"} />
+      <SettleCycleButton 
+        isAdmin={currentUser.role === "admin"} 
+        hasExpenses={expenses.length > 0}
+      />
     </div>
   );
 }
