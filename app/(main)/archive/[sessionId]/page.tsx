@@ -47,6 +47,9 @@ export default async function ArchiveDetailPage({
       })
     : "—";
 
+  // Show single date if start and end are the same
+  const dateRange = startDate === endDate ? startDate : `${startDate} — ${endDate}`;
+
   return (
     <div className="space-y-6">
       <Link
@@ -64,7 +67,7 @@ export default async function ArchiveDetailPage({
           </span>
         </div>
         <p className="mt-1 text-sm text-muted" dir="rtl">
-          {startDate} — {endDate}
+          {dateRange}
         </p>
       </div>
 

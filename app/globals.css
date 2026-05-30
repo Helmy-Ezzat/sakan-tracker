@@ -25,6 +25,24 @@
   --radius-card: 1rem;
 }
 
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --surface: #f8fafc;
+  --surface-elevated: #ffffff;
+  --surface-muted: #f1f5f9;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --danger-foreground: #ffffff;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

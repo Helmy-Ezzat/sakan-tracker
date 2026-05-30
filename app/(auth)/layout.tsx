@@ -11,7 +11,6 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">
             {ar.auth.signInTitle}
           </h1>
-          <p className="mt-2 text-sm text-muted">{ar.auth.signInSubtitle}</p>
         </div>
         {children}
       </div>

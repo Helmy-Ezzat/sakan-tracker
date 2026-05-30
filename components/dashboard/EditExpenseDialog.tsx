@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ar } from "@/lib/i18n/ar";
+import { cn } from "@/lib/utils";
 import type { Expense } from "@/types/database";
 import { useEffect, useState } from "react";
 
@@ -31,6 +32,24 @@ export function EditExpenseDialog({
     }
   }, [expense]);
 
+  useEffect(() => {
+    if (!expense) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [expense]);
+
+  useEffect(() => {
+    if (!expense) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape" && !isLoading) onCancel();
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [expense, isLoading, onCancel]);
+
   if (!expense) return null;
 
   async function handleSubmit(e: React.FormEvent) {
@@ -39,21 +58,28 @@ export function EditExpenseDialog({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !isLoading) onCancel();
-      }}
-    >
+    <div className="fixed inset-0 z-[70] h-full">
+      <button
+        type="button"
+        aria-label={ar.dashboard.cancel}
+        onClick={onCancel}
+        disabled={isLoading}
+        className="absolute inset-0 bg-black/65 backdrop-blur-[2px] transition-opacity duration-200"
+      />
+
       <div
-        className="w-full max-w-md rounded-t-2xl bg-surface p-6 sm:rounded-2xl"
         role="dialog"
+        aria-modal="true"
         aria-labelledby="edit-expense-title"
+        className={cn(
+          "absolute bottom-0 inset-x-0 sm:inset-x-4 sm:top-1/2 sm:bottom-auto mx-auto w-full max-w-sm sm:-translate-y-1/2",
+          "rounded-t-2xl sm:rounded-2xl border-t sm:border border-border bg-surface-elevated p-6 shadow-xl"
+        )}
       >
         <h2 id="edit-expense-title" className="text-lg font-semibold">
           {ar.dashboard.editExpenseTitle}
         </h2>
-        <p className="mt-1 text-sm text-muted">
+        <p className="mt-1 text-sm text-foreground/80">
           {ar.dashboard.editExpenseSubtitle}
         </p>
 
@@ -86,7 +112,10 @@ export function EditExpenseDialog({
             </p>
           ) : null}
 
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3">
+            <Button type="submit" fullWidth disabled={isLoading}>
+              {isLoading ? ar.dashboard.updating : ar.dashboard.updateExpense}
+            </Button>
             <Button
               type="button"
               variant="secondary"
@@ -95,9 +124,6 @@ export function EditExpenseDialog({
               disabled={isLoading}
             >
               {ar.dashboard.cancel}
-            </Button>
-            <Button type="submit" fullWidth disabled={isLoading}>
-              {isLoading ? ar.dashboard.updating : ar.dashboard.updateExpense}
             </Button>
           </div>
         </form>

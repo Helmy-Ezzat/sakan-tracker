@@ -3,7 +3,9 @@
 import { settleSession } from "@/app/actions/settle";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { useToast } from "@/components/ui/Toast";
 import { ar } from "@/lib/i18n/ar";
+import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 
 interface SettleCycleButtonProps {
@@ -12,6 +14,7 @@ interface SettleCycleButtonProps {
 }
 
 export function SettleCycleButton({ isAdmin, hasExpenses }: SettleCycleButtonProps) {
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +30,8 @@ export function SettleCycleButton({ isAdmin, hasExpenses }: SettleCycleButtonPro
         setError(result.error);
         setIsLoading(false);
         setOpen(false);
+      } else {
+        toast(ar.dashboard.settlementCompletedToast);
       }
       // If success, redirect happens automatically in the action
     } catch {
@@ -58,11 +63,15 @@ export function SettleCycleButton({ isAdmin, hasExpenses }: SettleCycleButtonPro
 
       <Button
         type="button"
-        variant="secondary"
+        variant="primary"
         fullWidth
         onClick={handleOpenDialog}
+        className="shadow-lg shadow-primary/20"
       >
-        {ar.dashboard.settleCycle}
+        <span className="flex items-center justify-center gap-2">
+          <CheckCircle2 size={18} strokeWidth={2} />
+          <span>{ar.dashboard.settleCycle}</span>
+        </span>
       </Button>
 
       <ConfirmDialog

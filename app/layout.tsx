@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Tajawal } from "next/font/google";
 import { ToastProvider } from "@/components/ui/Toast";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ar } from "@/lib/i18n/ar";
 import "./globals.css";
 
@@ -45,9 +46,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl" className={`${tajawal.variable} dark h-full`}>
+    <html lang="ar" dir="rtl" className={`${tajawal.variable} h-full`}>
       <body className="min-h-dvh font-sans">
-        <ToastProvider>{children}</ToastProvider>
+        <ThemeProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

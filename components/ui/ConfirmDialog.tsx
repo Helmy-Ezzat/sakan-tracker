@@ -48,7 +48,7 @@ export function ConfirmDialog({
 
   return (
     <div
-      className={cn("fixed inset-0 z-[60]", !open && "pointer-events-none")}
+      className={cn("fixed inset-0 z-[60] h-full", !open && "pointer-events-none")}
       aria-hidden={!open}
     >
       <button
@@ -69,19 +69,22 @@ export function ConfirmDialog({
         aria-labelledby="confirm-dialog-title"
         aria-describedby="confirm-dialog-desc"
         className={cn(
-          "absolute inset-x-4 top-1/2 mx-auto w-full max-w-sm -translate-y-1/2",
-          "rounded-2xl border border-warning/30 bg-surface-elevated p-5 shadow-xl",
+          "absolute bottom-0 inset-x-0 sm:inset-x-4 sm:top-1/2 sm:bottom-auto mx-auto w-full max-w-sm sm:-translate-y-1/2",
+          "rounded-t-2xl sm:rounded-2xl border-t sm:border border-border bg-surface-elevated p-6 shadow-xl",
           "transition-all duration-200",
-          open ? "scale-100 opacity-100" : "scale-95 opacity-0",
+          open ? "translate-y-0 sm:scale-100 opacity-100" : "translate-y-full sm:scale-95 opacity-0",
         )}
       >
         <h2
           id="confirm-dialog-title"
-          className="text-lg font-semibold text-warning"
+          className={cn(
+            "text-lg font-semibold",
+            variant === "danger" ? "text-danger" : "text-warning"
+          )}
         >
           {title}
         </h2>
-        <p id="confirm-dialog-desc" className="mt-2 text-sm text-muted">
+        <p id="confirm-dialog-desc" className="mt-2 text-sm text-foreground/80">
           {description}
         </p>
         {error ? (
@@ -89,7 +92,7 @@ export function ConfirmDialog({
             {error}
           </p>
         ) : null}
-        <div className="mt-5 flex flex-col gap-2 sm:flex-row-reverse">
+        <div className="mt-6 flex flex-col gap-3">
           <Button
             type="button"
             variant={variant === "danger" ? "danger" : "primary"}

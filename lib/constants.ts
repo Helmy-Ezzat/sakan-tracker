@@ -9,6 +9,7 @@ export const ROUTES = {
   expenses: "/expenses",
   settlement: "/settlement",
   archive: "/archive",
+  settings: "/settings",
 } as const;
 
 /** Max content width for mobile-first PWA shell */
